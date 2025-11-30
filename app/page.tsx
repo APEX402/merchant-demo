@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import {
   ChevronDown,
   ChevronLeft,
@@ -6,6 +8,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { Caveat } from "next/font/google";
+import { useSearchParams } from "next/navigation";
 
 const brandFont = Caveat({
   subsets: ["cyrillic"],
@@ -13,6 +16,40 @@ const brandFont = Caveat({
 });
 
 export default function Home() {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const hash = searchParams.get("hash");
+    const facilitatorSignature = searchParams.get("facilitatorSignature");
+
+    if (!hash || !facilitatorSignature) {
+      return;
+    }
+
+    const sendCompleteAd = async () => {
+      try {
+        const res = await fetch("/api/complete-ad", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ hash, facilitatorSignature }),
+        });
+
+        const data = await res.json().catch(() => null);
+        console.log("/api/complete-ad response", {
+          ok: res.ok,
+          status: res.status,
+          data,
+        });
+      } catch (error) {
+        console.error("/api/complete-ad error", error);
+      }
+    };
+
+    void sendCompleteAd();
+  }, [searchParams]);
+
   return (
     <div className="w-full min-h-screen bg-gray-100 text-gray-900 flex flex-col">
       {/* Header */}
