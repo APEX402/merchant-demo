@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useEffect } from "react";
+import React, { Suspense } from "react";
 import {
   ChevronDown,
   ChevronLeft,
@@ -8,7 +6,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { Caveat } from "next/font/google";
-import { useSearchParams } from "next/navigation";
+import { CompleteAdTracker } from "../components/CompleteAdTracker";
 
 const brandFont = Caveat({
   subsets: ["cyrillic"],
@@ -16,42 +14,11 @@ const brandFont = Caveat({
 });
 
 export default function Home() {
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const hash = searchParams.get("hash");
-    const facilitatorSignature = searchParams.get("facilitatorSignature");
-
-    if (!hash || !facilitatorSignature) {
-      return;
-    }
-
-    const sendCompleteAd = async () => {
-      try {
-        const res = await fetch("/api/complete-ad", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ hash, facilitatorSignature }),
-        });
-
-        const data = await res.json().catch(() => null);
-        console.log("/api/complete-ad response", {
-          ok: res.ok,
-          status: res.status,
-          data,
-        });
-      } catch (error) {
-        console.error("/api/complete-ad error", error);
-      }
-    };
-
-    void sendCompleteAd();
-  }, [searchParams]);
-
   return (
     <div className="w-full min-h-screen bg-gray-100 text-gray-900 flex flex-col">
+      <Suspense fallback={null}>
+        <CompleteAdTracker />
+      </Suspense>
       {/* Header */}
       <header className="w-full bg-[#d71921] text-white shadow-sm">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-6 py-3">
